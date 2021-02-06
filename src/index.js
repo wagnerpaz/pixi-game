@@ -1,5 +1,8 @@
 import * as PIXI from 'pixi.js';
 
+PIXI.settings.RESOLUTION = 4;
+PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+
 // The application will create a renderer using WebGL, if possible,
 // with a fallback to a canvas render. It will also setup the ticker
 // and the root stage PIXI.Container
@@ -7,43 +10,37 @@ const app = new PIXI.Application({transparent: true});
 
 app.renderer.view.style.position = "absolute";
 app.renderer.view.style.display = "block";
+app.renderer.view.style.backgroundColor = "#FF00FF";
 
-app.renderer.resize(window.innerWidth, window.innerHeight);
 window.onresize = function()
 {
-    app.renderer.resize(window.innerWidth, window.innerHeight);
+    app.renderer.resize(window.innerWidth / PIXI.settings.RESOLUTION, window.innerHeight / PIXI.settings.RESOLUTION);
 }
+window.onresize();
 
 // The application will create a canvas element for you that you
 // can then insert into the DOM
 document.body.appendChild(app.view);
 
 // load the texture we need
-app.loader.add('bunny', 'bunny.png').load((loader, resources) => {
-    // This creates a texture from a 'bunny.png' image
-    const bunny = new PIXI.Sprite(resources.bunny.texture);
+app.loader.add('hero.json').load((loader, resources) => {
+    const sheet = resources['hero.json'];
+    console.log(sheet);
 
-    // Setup the position of the bunny
-    bunny.x = app.renderer.width / 2;
-    bunny.y = app.renderer.height / 2;
+    const heroWalking = new PIXI.AnimatedSprite(sheet.spritesheet.animations["hero_walking"]);
 
-    // Rotate around the center
-    bunny.anchor.x = 0.5;
-    bunny.anchor.y = 0.5;
+    heroWalking.x = app.renderer.width / 2 / PIXI.settings.RESOLUTION;
+    heroWalking.y = app.renderer.height / 2 / PIXI.settings.RESOLUTION;
+    console.log(heroWalking)
 
-    // Add the bunny to the scene we are building
-    app.stage.addChild(bunny);
+    heroWalking.animationSpeed = 0.1; 
+    heroWalking.play();
 
-    // Listen for frame updates
-    app.ticker.add(() => {
-         // each frame we spin the bunny around a bit
-        bunny.rotation += 0.01;
-    });
+    app.stage.addChild(heroWalking);
 });
 
 app.renderer.on('resize', () => {
-    console.log('resizing...');
     const bunny = app.stage.getChildAt(0);
-    bunny.x = app.renderer.width / 2;
-    bunny.y = app.renderer.height / 2;
+    bunny.x = app.renderer.width / 2 / PIXI.settings.RESOLUTION;
+    bunny.y = app.renderer.height / 2 / PIXI.settings.RESOLUTION;
 });
