@@ -13,10 +13,12 @@ export default (app) => {
                 anims.push(anim);
                 return anim;
             };
-            const invalidateAnims = () => {
+            const invalidateAnims = (anim) => {
                 anims.forEach(a => {
-                    a.stop();
-                    a.renderable = false;
+                    if(a !== anim) {
+                        a.stop();
+                        a.renderable = false;
+                    }
                 });
             };
             const validateAnim = (anim) => {
@@ -24,7 +26,7 @@ export default (app) => {
                 anim.renderable = true;
             };
             const run = (anim) => {
-                invalidateAnims();
+                invalidateAnims(anim);
                 validateAnim(anim);
             }
     

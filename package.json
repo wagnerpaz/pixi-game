@@ -12,6 +12,7 @@
     "build": "webpack"
   },
   "dependencies": {
+    "nipplejs": "^0.8.7",
     "pixi.js": "^5.3.3"
   },
   "devDependencies": {

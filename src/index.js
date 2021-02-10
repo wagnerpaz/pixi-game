@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+import nipplejs from 'nipplejs';
+
 import heroAnim from './anims/heroAnim';
 import keyboard from './utils/keyboard';
 
@@ -24,6 +26,8 @@ window.onresize();
 // can then insert into the DOM
 document.body.appendChild(app.view);
 
+const nippleManager = nipplejs.create({zone: document.getElementById('controls-overlay'), color: '#333', maxNumberOfNipples: 1});
+
 heroAnim(app).then(heroAnim => {
     const hero = new PIXI.Container();
     hero.vx = 0;
@@ -32,8 +36,29 @@ heroAnim(app).then(heroAnim => {
     hero.x = app.renderer.width / 2 / PIXI.settings.RESOLUTION;
     hero.y = app.renderer.height / 2 / PIXI.settings.RESOLUTION;
     heroAnim.stand();
-
+    
     app.stage.addChild(hero);
+    
+    nippleManager.on('start', (e, vJoystick) => {
+        vJoystick.on('move', (e, {direction, force}) => {
+            if(direction) {
+                if(direction.x === "right") {
+                    hero.vx = Math.min(force, 3) * 0.33;
+                    hero.scale.x = 1;
+                    heroAnim.walk();
+                } else {
+                    hero.vx = Math.min(force, 3) * -0.33;
+                    hero.scale.x = -1;
+                    heroAnim.walk();
+                }
+            }
+        });
+    });
+
+    nippleManager.on('end', () => {
+        hero.vx = 0;
+        heroAnim.stand();
+    });
 
     const moveLeft = keyboard("ArrowLeft");
     moveLeft.press = () => {
