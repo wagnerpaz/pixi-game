@@ -1,10 +1,15 @@
 import * as PIXI from 'pixi.js';
-import nipplejs from 'nipplejs';
 import Bump from 'bump.js';
 import SAT from 'sat';
 
 import heroAnim from './anims/heroAnim';
-import keyboard from './utils/keyboard';
+import HeroState, { FALLING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from './state/HeroActionsState';
+import keyboardDriver from './controllers/keyboardDriver';
+import mobileDriver from './controllers/mobileDriver';
+
+const GRAVITY = 0.098;
+const VELOCITY_X = 1;
+const VELOCITY_Y = 2;
 
 PIXI.settings.RESOLUTION = 5;
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
@@ -30,82 +35,10 @@ window.onresize();
 // can then insert into the DOM
 document.body.appendChild(app.view);
 
-const nippleManager = nipplejs.create({zone: document.getElementById('controls-overlay'), color: '#333', maxNumberOfNipples: 1});
-
 const hero = new PIXI.Container();
 
 heroAnim(PIXI, app, hero).then(heroAnim => {
-    hero.vx = 0;
-    hero.vy = 0;
-    hero.x = app.renderer.width / 2 / PIXI.settings.RESOLUTION;
-    hero.y = app.renderer.height / 2 / PIXI.settings.RESOLUTION - hero.height;
-    heroAnim.stand();
-    
-    app.stage.addChild(hero);
-    
-    nippleManager.on('start', (e, vJoystick) => {
-        vJoystick.on('move', (e, {direction, force}) => {
-            if(direction) {
-                if(direction.x === "right") {
-                    hero.vx = Math.min(force, 3) * 0.33;
-                    hero.scale.x = 1;
-                    heroAnim.walk();
-                } else {
-                    hero.vx = Math.min(force, 3) * -0.33;
-                    hero.scale.x = -1;
-                    heroAnim.walk();
-                }
-            }
-        });
-    });
-
-    nippleManager.on('end', () => {
-        hero.vx = 0;
-        heroAnim.stand();
-    });
-
-    const moveLeft = keyboard("ArrowLeft");
-    moveLeft.press = () => {
-        hero.vx = -1;
-        hero.scale.x = -1;
-        heroAnim.walk();
-    };
-    moveLeft.release = () => {
-        hero.vx = 0;
-        heroAnim.stand();
-    }
-
-    const moveRight = keyboard("ArrowRight");
-    moveRight.press = () => {
-        hero.vx = 1;
-        hero.scale.x = 1;
-        heroAnim.walk();
-    };
-    moveRight.release = () => {
-        hero.vx = 0;
-        heroAnim.stand();
-    };
-
-    const moveUp = keyboard("ArrowUp");
-    moveUp.press = () => {
-        hero.vy = -1;
-        heroAnim.walk();
-    };
-    moveUp.release = () => {
-        hero.vy = 0;
-        heroAnim.stand();
-    };
-
-    const moveDown = keyboard("ArrowDown");
-    moveDown.press = () => {
-        hero.vy = 1;
-        heroAnim.walk();
-    };
-    moveDown.release = () => {
-        hero.vy = 0;
-        heroAnim.stand();
-    };
-
+    const colidables = [];
     const floor = new PIXI.Graphics();
     floor.beginFill(0x00FF00);
     floor.drawRect(0, 0, app.view.width / 1.5 / PIXI.settings.RESOLUTION, app.view.height/ 1.5 / PIXI.settings.RESOLUTION);
@@ -113,6 +46,7 @@ heroAnim(PIXI, app, hero).then(heroAnim => {
     floor.x = 0;
     floor.y = app.renderer.height / 1.5 / PIXI.settings.RESOLUTION;
     app.stage.addChild(floor);
+    colidables.push(floor);
 
     const wall1 = new PIXI.Graphics();
     wall1.beginFill(0x00FF00);
@@ -121,40 +55,92 @@ heroAnim(PIXI, app, hero).then(heroAnim => {
     wall1.x = 0;
     wall1.y = 0;
     app.stage.addChild(wall1);
+    colidables.push(wall1);
 
+    hero.vx = 0;
+    hero.vy = 0;
+    hero.x = app.renderer.width / 2 / PIXI.settings.RESOLUTION;
+    hero.y = 0;
+    heroAnim.stand();
+    
+    app.stage.addChild(hero);
+    
+    const {controls, updateState} = HeroState(((action, param) => {
+        if(action === MOVING_LEFT) {
+            console.log('moving left');
+            hero.vx = -VELOCITY_X;
+            hero.scale.x = -1;
+            if(!param) {
+                heroAnim.walk();
+            }
+        } else if (action === MOVING_RIGHT) {
+            console.log('moving right');
+            hero.vx = VELOCITY_X;
+            hero.scale.x = 1;
+            if(!param) {
+                heroAnim.walk();
+            }
+        }
+
+        if(action === RISING) {
+            console.log('rising');
+            hero.vy = -VELOCITY_Y;
+            heroAnim.rise();
+
+        } else if(action === FALLING) {
+            console.log('falling');
+            heroAnim.fall();
+        }
+
+        if(action === STANDING) {
+            console.log('standing');
+            hero.vx = 0;
+            if(!param) {
+                heroAnim.stand();
+            }
+        }
+    }));
+
+    keyboardDriver(controls);
+    mobileDriver(controls);
+
+    // app.ticker.maxFPS = 1;
     app.ticker.add(delta => {
-        const GRAVITY = 0.05;
-        
         hero.vy += GRAVITY;
         const xu = hero.vx * delta;
         const yu = hero.vy * delta;
-
-        const heroNewPosX = parentPositionRef(hero.getChildAt(0).boundingBox, xu, 0);
-        if(hitTestRectangle(heroNewPosX, floor) && hero.vx !== 0) {
-            hero.vx = 0;
-        }
-        else {
-            hero.x += xu;
-        }
         
-        const heroNewPosY = parentPositionRef(hero.getChildAt(0).boundingBox, 0, yu);
-        if(hitTestRectangle(heroNewPosY, floor) && hero.vy !== 0) {
-            hero.vy = 0;
-        }
-        else {
-            hero.y += yu;
-        }
+        hero.x += xu;
+        hero.y += yu;
+
+        const heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
+        
+        colidables.forEach((collidable) => {
+            const hitResp = hitTestRectangle(heroBB, collidable);
+            if(!!hitResp) {
+                if(hitResp.overlapV.x) {
+                    hero.vx = 0;
+                    hero.x -= hitResp.overlapV.x;
+                }
+                if(hitResp.overlapV.y) {
+                    hero.vy = 0;
+                    hero.y -= hitResp.overlapV.y;
+                }
+            }
+        });
+
+        updateState(hero.vx, hero.vy);
     });
 });
 
-function parentPositionRef(child, xu, yu) {
+function parentPositionRef(child, xu = 0, yu = 0) {
     const parent = child.parent;
     const clone = child.clone();
 
     clone.x = parent.x + child.x;
     clone.y = parent.y + child.y;
 
-    clone.x -= child.pivot.x / 2;
+    clone.x -= child.width / 2;
     clone.y -= child.pivot.y / 2;
     
     clone.x += xu;
@@ -166,7 +152,12 @@ function parentPositionRef(child, xu, yu) {
 function hitTestRectangle(obj1, obj2) {
     const box1 = toSatBoxPolygon(obj1);
     const box2 = toSatBoxPolygon(obj2);
-    return SAT.testPolygonPolygon(box1, box2);
+    const response = new SAT.Response();
+    const hit = SAT.testPolygonPolygon(box1, box2, response);
+    if(hit) {
+        return response;
+    }
+    return false;
 }
 
 function toSatBoxPolygon(obj) {

@@ -14,6 +14,7 @@ export default (PIXI, app, container) => {
             const invalidateAnims = (anim) => {
                 anims.forEach(a => {
                     a.stop();
+                    a.gotoAndStop(0);
                     container.removeChildren();
                 });
             };
@@ -44,6 +45,22 @@ export default (PIXI, app, container) => {
             heroWalking.boundingBox.visible = false;
             heroWalking.boundingBox.lineStyle(1, 0xFF0000);
             heroWalking.boundingBox.drawRect(3, 1, 10, 15);
+
+            const heroRising = addAnim("hero_rising");
+            heroRising.loop = false;
+            heroRising.animationSpeed = 0.09;
+            heroRising.boundingBox = new PIXI.Graphics();
+            heroRising.boundingBox.visible = false;
+            heroRising.boundingBox.lineStyle(1, 0xFF0000);
+            heroRising.boundingBox.drawRect(3, 1, 10, 15);
+
+            const heroFalling = addAnim("hero_falling");
+            heroFalling.loop = false;
+            heroFalling.animationSpeed = 0.09;
+            heroFalling.boundingBox = new PIXI.Graphics();
+            heroFalling.boundingBox.visible = false;
+            heroFalling.boundingBox.lineStyle(1, 0xFF0000);
+            heroFalling.boundingBox.drawRect(3, 1, 10, 15);
     
             const result = {
                 anims,
@@ -52,6 +69,12 @@ export default (PIXI, app, container) => {
                 },
                 stand: () => {
                     return run(heroStanding);
+                },
+                rise: () => {
+                    return run(heroRising);
+                },
+                fall: () => {
+                    return run(heroFalling);
                 }
             }
 
