@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
@@ -12,4 +13,9 @@ module.exports = {
         filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'public'),
     },
+    plugins: [
+        new webpack.ProvidePlugin({
+          PIXI: 'pixi.js'
+        })
+      ]
 };

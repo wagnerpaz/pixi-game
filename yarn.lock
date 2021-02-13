@@ -2574,6 +2574,11 @@ pinkie@^2.0.0:
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
 
+pixi-tilemap@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/pixi-tilemap/-/pixi-tilemap-2.1.4.tgz#96e9eaa1405222c961da8091c1e05bf64abfe0df"
+  integrity sha512-0sWZIdBn1aRiF4S9q/+gRHKEYp7AZhliX3Ae5LftqY+qJXsOvwVAfOv33/x+6a+T4LgVExhIsk57dSH/QCRr0A==
+
 pixi.js@^5.3.3:
   version "5.3.7"
   resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-5.3.7.tgz#d295076cdb631a0578ee5976d9da195087b6a50e"
