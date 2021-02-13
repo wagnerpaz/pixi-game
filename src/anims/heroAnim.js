@@ -1,5 +1,3 @@
-import * as PIXI from 'pixi.js';
-
 export default (PIXI, app, container) => {
     return new Promise(res => {
         app.loader.add('hero.json').load((loader, resources) => {
@@ -34,17 +32,17 @@ export default (PIXI, app, container) => {
             const heroStanding = addAnim("hero_standing");
             heroStanding.animationSpeed = 0.025;
             heroStanding.boundingBox = new PIXI.Graphics();
-            heroStanding.boundingBox.visible = false;
+            heroStanding.boundingBox.visible = true;
             heroStanding.boundingBox.lineStyle(1, 0xFF0000);
-            heroStanding.boundingBox.drawRect(3, 2, 10, 14);
+            heroStanding.boundingBox.drawRect(3, 1, 10, 15);
 
             
             const heroWalking = addAnim("hero_walking");
             heroWalking.animationSpeed = 0.1; 
             heroWalking.boundingBox = new PIXI.Graphics();
-            heroWalking.boundingBox.visible = false;
+            heroWalking.boundingBox.visible = true;
             heroWalking.boundingBox.lineStyle(1, 0xFF0000);
-            heroWalking.boundingBox.drawRect(3, 2, 10, 14);
+            heroWalking.boundingBox.drawRect(3, 1, 10, 15);
 
             const heroRising = addAnim("hero_rising");
             heroRising.loop = false;
@@ -52,7 +50,7 @@ export default (PIXI, app, container) => {
             heroRising.boundingBox = new PIXI.Graphics();
             heroRising.boundingBox.visible = false;
             heroRising.boundingBox.lineStyle(1, 0xFF0000);
-            heroRising.boundingBox.drawRect(3, 2, 10, 14);
+            heroRising.boundingBox.drawRect(3, 1, 10, 15);
 
             const heroFalling = addAnim("hero_falling");
             heroFalling.loop = false;
@@ -60,7 +58,7 @@ export default (PIXI, app, container) => {
             heroFalling.boundingBox = new PIXI.Graphics();
             heroFalling.boundingBox.visible = false;
             heroFalling.boundingBox.lineStyle(1, 0xFF0000);
-            heroFalling.boundingBox.drawRect(3, 2, 10, 14);
+            heroFalling.boundingBox.drawRect(3, 1, 10, 15);
     
             const result = {
                 anims,
@@ -78,7 +76,7 @@ export default (PIXI, app, container) => {
                 }
             }
 
-            res(result);
+            res({anims: result});
         });
     });
 };

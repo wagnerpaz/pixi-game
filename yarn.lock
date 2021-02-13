@@ -780,11 +780,6 @@ buffer-indexof@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-indexof/-/buffer-indexof-1.1.1.tgz#52fabcc6a606d1a00302802648ef68f639da268c"
   integrity sha512-4/rOEg86jivtPTeOUUT61jJO1Ya1TrR/OkqCSZDyq84WJh3LuuiphBYJN+fm5xufIk4XAFcEwte/8WzC8If/1g==
 
-bump.js@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/bump.js/-/bump.js-1.0.3.tgz#e0bd953d1ac46d60ab24610d7c632f92295cf8d4"
-  integrity sha1-4L2VPRrEbWCrJGENfGMvkilc+NQ=
-
 bytes@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.0.0.tgz#d32815404d689699f85a4ea4fa8755dd13a96048"
@@ -2632,11 +2627,6 @@ pkg-dir@^4.2.0:
   integrity sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==
   dependencies:
     find-up "^4.0.0"
-
-planck-js@^0.3.26:
-  version "0.3.26"
-  resolved "https://registry.yarnpkg.com/planck-js/-/planck-js-0.3.26.tgz#34437f07e5cebd5e09482987198bc7604b184fae"
-  integrity sha512-MpcMhnJUm3zklT6zJbpDETqeF7uprEqKZUu0lcP3pE7uTxSmHt7toHPU/BBI5JEINzvW5fj4w/8fOsskFrTH3Q==
 
 portfinder@^1.0.26:
   version "1.0.28"

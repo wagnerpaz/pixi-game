@@ -1,24 +1,15 @@
-import Bump from 'bump.js';
+import * as PIXI from 'pixi.js';
 import SAT from 'sat';
 
-import * as PIXI from 'pixi.js';
-import {CompositeRectTileLayer} from 'pixi-tilemap/dist/pixi-tilemap';
+import createHero from './actors/hero';
+import createCave from './stages/cave';
 
-import caveTilemap from './cave-8.json';
-
-import heroAnim from './anims/heroAnim';
-import HeroState, { FALLING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from './state/HeroActionsState';
-import keyboardDriver from './controllers/keyboardDriver';
-import mobileDriver from './controllers/mobileDriver';
-
-const GRAVITY = 0.098;
-const VELOCITY_X = 1;
-const VELOCITY_Y = 2;
+export const GRAVITY = 0.098;
+export const VELOCITY_X = 1;
+export const VELOCITY_Y = 2;
 
 PIXI.settings.RESOLUTION = 5;
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-
-const b = new Bump(PIXI);
 
 // The application will create a renderer using WebGL, if possible,
 // with a fallback to a canvas render. It will also setup the ticker
@@ -39,137 +30,24 @@ window.onresize();
 // can then insert into the DOM
 document.body.appendChild(app.view);
 
-const hero = new PIXI.Container();
-
-app.loader.add('cave-8_1.png').add('cave-8_2.png').add('cave-8_3.png').add('cave-8_4.png').load((loader, resources) => {
-    const tilemap = new CompositeRectTileLayer(0, resources);
-
-    const colidables = [];
-
-    var size = caveTilemap.tileheight;
-    // bah, im too lazy, i just want to specify filenames from atlas
-    for (var i=0; i < caveTilemap.tileswide; i++) {
-        for (var j=0; j< caveTilemap.tileshigh; j++) {
-            const tile = caveTilemap.layers[0].tiles.find(t => t.x === i && t.y === j);
-            if(tile.tile !== -1 && tile.tile !== 0) {
-                const texture = resources[`cave-8_${tile.tile}.png`].texture;
-                
-                let rot;
-                switch(tile.rot) {
-                    case 1: rot = 6; break;
-                    case 2: rot = 4; break;
-                    case 3: rot = 2; break;
-                }
-                if(tile.flipX) {
-                    rot = 12;
-                }
-                texture.rotate = rot;
-
-                tilemap.addFrame(texture, i*size, j*size);
-
-                colidables.push({x: i * size, y: j * size, width: size, height: size});
-            }
-        }
-    }
-
-    app.stage.addChild(tilemap);
-
-    console.log('tilemap', tilemap);
-    console.log(colidables);
-
-
-heroAnim(PIXI, app, hero).then(heroAnim => {
-    // const colidables = [];
-    // const floor = new PIXI.Graphics();
-    // floor.beginFill(0x00FF00);
-    // floor.drawRect(0, 0, app.view.width / 1.5 / PIXI.settings.RESOLUTION, app.view.height/ 1.5 / PIXI.settings.RESOLUTION);
-    // floor.endFill();
-    // floor.x = 0;
-    // floor.y = app.renderer.height / 1.5 / PIXI.settings.RESOLUTION;
-    // app.stage.addChild(floor);
-    // colidables.push(floor);
-
-    // const wall1 = new PIXI.Graphics();
-    // wall1.beginFill(0x00FF00);
-    // wall1.drawRect(0, 0, 10, app.view.height / PIXI.settings.RESOLUTION);
-    // wall1.endFill();
-    // wall1.x = 0;
-    // wall1.y = 0;
-    // app.stage.addChild(wall1);
-    // colidables.push(wall1);
-
-    hero.vx = 0;
-    hero.vy = 0;
-    hero.x = app.renderer.width / 2 / PIXI.settings.RESOLUTION;
-    hero.y = 4 * 16 / PIXI.settings.RESOLUTION;
-    heroAnim.stand();
-    
-    app.stage.addChild(hero);
-    
-    const {controls, updateState} = HeroState(((action, param) => {
-        if(action === MOVING_LEFT) {
-            console.log('moving left');
-            hero.vx = -VELOCITY_X;
-            hero.scale.x = -1;
-            if(!param) {
-                heroAnim.walk();
-            }
-        } else if (action === MOVING_RIGHT) {
-            console.log('moving right');
-            hero.vx = VELOCITY_X;
-            hero.scale.x = 1;
-            if(!param) {
-                heroAnim.walk();
-            }
-        }
-
-        if(action === RISING) {
-            console.log('rising');
-            hero.vy = -VELOCITY_Y;
-            heroAnim.rise();
-
-        } else if(action === FALLING) {
-            console.log('falling');
-            heroAnim.fall();
-        }
-
-        if(action === STANDING) {
-            console.log('standing');
-            hero.vx = 0;
-            if(!param) {
-                heroAnim.stand();
-            }
-        }
-    }));
-
-    keyboardDriver(controls);
-    mobileDriver(controls);
+async function load() {
+    const {collidables} = await createCave(app);
+    const {actor: hero, updateBeforeCol: updateHeroBC, updateAfterCol: updateHeroAC} = await createHero(app);
+    app.stage.addChild(hero); 
 
     // app.ticker.maxFPS = 1;
     app.ticker.add(delta => {
-        hero.vy += GRAVITY;
-        const xu = hero.vx * delta;
-        const yu = hero.vy * delta;
-        
-        hero.x += xu;
-        hero.y += yu;
+        updateHeroBC(delta);
 
-        let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
-        
-        colidables.every((collidable) => {
+        collidables.every((collidable) => {
+            let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
             let hitResp = hitTestRectangle(heroBB, collidable);
             if(!!hitResp) {
                 if(hitResp.overlapV.x) {
                     hero.x -= hitResp.overlapV.x;
-                    hero.y -= hitResp.overlapV.y;
                 }
-                
-                heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
-                hitResp = hitTestRectangle(heroBB, collidable);
-
-                if(hitResp.overlapV.y) {
+                else if(hitResp.overlapV.y) {
                     hero.vy = 0;
-                    hero.x -= hitResp.overlapV.x;
                     hero.y -= hitResp.overlapV.y;
                 }
             }
@@ -177,10 +55,12 @@ heroAnim(PIXI, app, hero).then(heroAnim => {
             return true;
         });
 
-        updateState(hero.vx, hero.vy);
+        updateHeroAC(delta);
     });
-});
-});
+};
+load();
+
+
 
 function parentPositionRef(child, xu = 0, yu = 0) {
     const parent = child.parent;
@@ -212,9 +92,3 @@ function hitTestRectangle(obj1, obj2) {
 function toSatBoxPolygon(obj) {
     return new SAT.Box(new SAT.Vector(obj.x, obj.y), obj.width, obj.height).toPolygon();
 }
-
-app.renderer.on('resize', () => {
-    const bunny = app.stage.getChildAt(0);
-    bunny.x = app.renderer.width / 2 / PIXI.settings.RESOLUTION;
-    bunny.y = app.renderer.height / 2 / PIXI.settings.RESOLUTION;
-});
