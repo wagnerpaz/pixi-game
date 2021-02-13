@@ -15,8 +15,8 @@ export default (app) => {
 
         hero.vx = 0;
         hero.vy = 0;
-        hero.x = app.renderer.width / 2 / PIXI.settings.RESOLUTION;
-        hero.y = 4 * 16 / PIXI.settings.RESOLUTION;
+        hero.x = 100;
+        hero.y = 100;
         heroAnim.stand();
         
         const {controls, updateState} = HeroState(((action, param) => {

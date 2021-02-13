@@ -32,7 +32,7 @@ export default (PIXI, app, container) => {
             const heroStanding = addAnim("hero_standing");
             heroStanding.animationSpeed = 0.025;
             heroStanding.boundingBox = new PIXI.Graphics();
-            heroStanding.boundingBox.visible = true;
+            heroStanding.boundingBox.visible = false;
             heroStanding.boundingBox.lineStyle(1, 0xFF0000);
             heroStanding.boundingBox.drawRect(3, 1, 10, 15);
 
@@ -40,7 +40,7 @@ export default (PIXI, app, container) => {
             const heroWalking = addAnim("hero_walking");
             heroWalking.animationSpeed = 0.1; 
             heroWalking.boundingBox = new PIXI.Graphics();
-            heroWalking.boundingBox.visible = true;
+            heroWalking.boundingBox.visible = false;
             heroWalking.boundingBox.lineStyle(1, 0xFF0000);
             heroWalking.boundingBox.drawRect(3, 1, 10, 15);
 

@@ -41,9 +41,7 @@ export default (app) => {
                 }
             }
         
-            app.stage.addChild(tilemap);
-        
-            res({collidables});
+            res({collidables, tilemap});
         });
     });
 

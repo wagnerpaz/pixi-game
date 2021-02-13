@@ -2,6 +2,13 @@
 # yarn lockfile v1
 
 
+"@babel/runtime@^7.11.2":
+  version "7.12.13"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.13.tgz#0a21452352b02542db0ffb928ac2d3ca7cb6d66d"
+  integrity sha512-8+3UMPBrjFa/6TtKi/7sehPKqfAm4g6K+YQjyyFOLUTxzOngcRZTlAVY8sc2CORJYqdHQY8gRPHmn+qo15rCBw==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@pixi/accessibility@5.3.7":
   version "5.3.7"
   resolved "https://registry.yarnpkg.com/@pixi/accessibility/-/accessibility-5.3.7.tgz#a9ca9c7c04925014af4b137b38dd8b77b208e603"
@@ -1730,6 +1737,13 @@ human-signals@^1.1.1:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
   integrity sha512-SEQu7vl8KjNL2eoGBLF3+wAjpsNfA9XMlXAYj/3EdaNfAlxKthD1xjEQfGOUhllCGGJVNY34bRr6lPINhNjyZw==
 
+hypergiant@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/hypergiant/-/hypergiant-3.1.0.tgz#7ec3884afa67561e1911d02741873fcb811a6924"
+  integrity sha512-ddDjI/p+peymGseSuiWbyyiPhmCmuAyWzrZHefR2zBBE0BX2g/a0+De7zkS0qq5QUmpIAkQGXpoB71wKNinBvg==
+  dependencies:
+    "@babel/runtime" "^7.11.2"
+
 iconv-lite@0.4.24:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
@@ -2569,6 +2583,13 @@ pinkie@^2.0.0:
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
 
+pixi-game-camera@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/pixi-game-camera/-/pixi-game-camera-1.0.0.tgz#0483ab0a40a4873e69abba78b5fa4a3a27bacc1d"
+  integrity sha512-e6Dhr+ErIgcO569WsSyQJLTx3ka1vsuR4LU8SGFeXQqmLXPdozC+C4L0m1p6kO3TXEAf3ZscrNWgJKzAKygM2g==
+  dependencies:
+    hypergiant "^3.1.0"
+
 pixi-tilemap@^2.1.4:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/pixi-tilemap/-/pixi-tilemap-2.1.4.tgz#96e9eaa1405222c961da8091c1e05bf64abfe0df"
@@ -2757,6 +2778,11 @@ reduce-flatten@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/reduce-flatten/-/reduce-flatten-2.0.0.tgz#734fd84e65f375d7ca4465c69798c25c9d10ae27"
   integrity sha512-EJ4UNY/U1t2P/2k6oqotuX2Cc3T6nxJwsM0N0asT7dhrtH1ltUxDn4NalSYmPE2rCkVpcf/X6R0wDwcFpzhd4w==
+
+regenerator-runtime@^0.13.4:
+  version "0.13.7"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.7.tgz#cac2dacc8a1ea675feaabaeb8ae833898ae46f55"
+  integrity sha512-a54FxoJDIr27pgf7IgeQGxmqUNYrcV338lf/6gH456HZ/PhX+5BcwHXG9ajESmwe6WRO0tAzRUrRmNONWgkrew==
 
 regex-not@^1.0.0, regex-not@^1.0.2:
   version "1.0.2"

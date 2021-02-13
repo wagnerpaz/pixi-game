@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "nipplejs": "^0.8.7",
+    "pixi-game-camera": "^1.0.0",
     "pixi-tilemap": "^2.1.4",
     "pixi.js": "^5.3.3",
     "sat": "^0.8.0"
