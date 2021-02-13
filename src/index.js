@@ -4,7 +4,7 @@ import SAT from 'sat';
 import * as PIXI from 'pixi.js';
 import {CompositeRectTileLayer} from 'pixi-tilemap/dist/pixi-tilemap';
 
-import caveTilemap from './cave.json';
+import caveTilemap from './cave-8.json';
 
 import heroAnim from './anims/heroAnim';
 import HeroState, { FALLING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from './state/HeroActionsState';
@@ -13,9 +13,9 @@ import mobileDriver from './controllers/mobileDriver';
 
 const GRAVITY = 0.098;
 const VELOCITY_X = 1;
-const VELOCITY_Y = 3;
+const VELOCITY_Y = 2;
 
-PIXI.settings.RESOLUTION = 2;
+PIXI.settings.RESOLUTION = 5;
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 const b = new Bump(PIXI);
@@ -41,8 +41,8 @@ document.body.appendChild(app.view);
 
 const hero = new PIXI.Container();
 
-app.loader.add('cave_0.png').add('cave_1.png').add('cave_2.png').add('cave_3.png').add('cave_4.png').load((loader, resources) => {
-    const tilemap = new CompositeRectTileLayer(0, [resources['cave_3.png'].texture]);
+app.loader.add('cave-8_1.png').add('cave-8_2.png').add('cave-8_3.png').add('cave-8_4.png').load((loader, resources) => {
+    const tilemap = new CompositeRectTileLayer(0, resources);
 
     const colidables = [];
 
@@ -52,7 +52,7 @@ app.loader.add('cave_0.png').add('cave_1.png').add('cave_2.png').add('cave_3.png
         for (var j=0; j< caveTilemap.tileshigh; j++) {
             const tile = caveTilemap.layers[0].tiles.find(t => t.x === i && t.y === j);
             if(tile.tile !== -1 && tile.tile !== 0) {
-                const oldTexture = resources[`cave_${tile.tile}.png`].texture;
+                const texture = resources[`cave-8_${tile.tile}.png`].texture;
                 
                 let rot;
                 switch(tile.rot) {
@@ -63,9 +63,9 @@ app.loader.add('cave_0.png').add('cave_1.png').add('cave_2.png').add('cave_3.png
                 if(tile.flipX) {
                     rot = 12;
                 }
-                const newTexture = new PIXI.Texture(oldTexture, oldTexture.frame, oldTexture.orig, oldTexture.trim, rot);
+                texture.rotate = rot;
 
-                tilemap.addFrame(newTexture, i*size, j*size);
+                tilemap.addFrame(texture, i*size, j*size);
 
                 colidables.push({x: i * size, y: j * size, width: size, height: size});
             }
@@ -154,20 +154,27 @@ heroAnim(PIXI, app, hero).then(heroAnim => {
         hero.x += xu;
         hero.y += yu;
 
-        const heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
+        let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
         
-        colidables.forEach((collidable) => {
-            const hitResp = hitTestRectangle(heroBB, collidable);
+        colidables.every((collidable) => {
+            let hitResp = hitTestRectangle(heroBB, collidable);
             if(!!hitResp) {
                 if(hitResp.overlapV.x) {
-                    hero.vx = 0;
                     hero.x -= hitResp.overlapV.x;
+                    hero.y -= hitResp.overlapV.y;
                 }
+                
+                heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
+                hitResp = hitTestRectangle(heroBB, collidable);
+
                 if(hitResp.overlapV.y) {
                     hero.vy = 0;
+                    hero.x -= hitResp.overlapV.x;
                     hero.y -= hitResp.overlapV.y;
                 }
             }
+
+            return true;
         });
 
         updateState(hero.vx, hero.vy);

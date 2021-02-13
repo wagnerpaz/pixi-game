@@ -36,7 +36,7 @@ export default (PIXI, app, container) => {
             heroStanding.boundingBox = new PIXI.Graphics();
             heroStanding.boundingBox.visible = false;
             heroStanding.boundingBox.lineStyle(1, 0xFF0000);
-            heroStanding.boundingBox.drawRect(3, 1, 10, 15);
+            heroStanding.boundingBox.drawRect(3, 2, 10, 14);
 
             
             const heroWalking = addAnim("hero_walking");
@@ -44,7 +44,7 @@ export default (PIXI, app, container) => {
             heroWalking.boundingBox = new PIXI.Graphics();
             heroWalking.boundingBox.visible = false;
             heroWalking.boundingBox.lineStyle(1, 0xFF0000);
-            heroWalking.boundingBox.drawRect(3, 1, 10, 15);
+            heroWalking.boundingBox.drawRect(3, 2, 10, 14);
 
             const heroRising = addAnim("hero_rising");
             heroRising.loop = false;
@@ -52,7 +52,7 @@ export default (PIXI, app, container) => {
             heroRising.boundingBox = new PIXI.Graphics();
             heroRising.boundingBox.visible = false;
             heroRising.boundingBox.lineStyle(1, 0xFF0000);
-            heroRising.boundingBox.drawRect(3, 1, 10, 15);
+            heroRising.boundingBox.drawRect(3, 2, 10, 14);
 
             const heroFalling = addAnim("hero_falling");
             heroFalling.loop = false;
@@ -60,7 +60,7 @@ export default (PIXI, app, container) => {
             heroFalling.boundingBox = new PIXI.Graphics();
             heroFalling.boundingBox.visible = false;
             heroFalling.boundingBox.lineStyle(1, 0xFF0000);
-            heroFalling.boundingBox.drawRect(3, 1, 10, 15);
+            heroFalling.boundingBox.drawRect(3, 2, 10, 14);
     
             const result = {
                 anims,
