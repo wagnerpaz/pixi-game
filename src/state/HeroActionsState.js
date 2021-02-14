@@ -63,6 +63,7 @@ export default (callback) => {
 
     controls.attack.press = () => {
         if(!attacking) {
+            standing = false;
             attackPressed = true;
             attacking = true;
             callback(ATTACKING, falling || rising);
