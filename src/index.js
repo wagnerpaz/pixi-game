@@ -90,7 +90,20 @@ async function load() {
             return true;
         });
         
-        updateHeroAC(delta);
+        let ceilled = false;
+        collidables.every((collidable) => {
+            let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
+            heroBB.y -= VELOCITY_Y;
+            
+            let hitResp = hitTestRectangle(heroBB, collidable);
+            if(!!hitResp && hitResp.overlapV.y) {
+                ceilled = true;
+                return false;
+            }
+            return true;
+        });
+        
+        updateHeroAC(delta, ceilled);
 
         const nxu = hero.x - oxu;
         const nyu = hero.y - oyu;

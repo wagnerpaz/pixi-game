@@ -2,7 +2,14 @@ import { ATTACKING, FALLING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from 
 import {ANIM_COMPLETED, ANIM_STOPED} from '../anims/heroAnim';
 
 export default (callback) => {
+    let moveLeftPressed = false;
+    let moveRightPressed = false;
+    let jumpPressed = false;
+    let attackPressed = false;
+
     let standing = false;
+    let onGround = false;
+    let onCeil = false;
     let movingLeft = false;
     let movingRight = false;
     let rising = false;
@@ -12,95 +19,120 @@ export default (callback) => {
     const controls = {left: {}, right: {}, jump: {}, attack: {}};
 
     controls.left.press = () => {
-        movingLeft = true;
         standing = false;
-        callback(MOVING_LEFT, rising || falling);
+        moveLeftPressed = true;
+        movingLeft = true;
+        movingRight = false;
+        if(attacking) return;
+        callback(MOVING_LEFT, falling || rising);
     };
     controls.left.release = () => {
+        moveLeftPressed = false;
         movingLeft = false;
-        if(movingRight) {
-            callback(MOVING_RIGHT, rising || falling);
-        }
-        else {
-            standing = true;
-            callback(STANDING, rising || falling);
+        if(moveRightPressed) {
+            controls.right.press();
         }
     }
 
     controls.right.press = () => {
-        movingRight = true;
         standing = false;
-        callback(MOVING_RIGHT, rising || falling);
+        moveRightPressed = true;
+        movingRight = true;
+        movingLeft = false;
+        if(attacking) return;
+        callback(MOVING_RIGHT, falling || rising);
     };
     controls.right.release = () => {
+        moveRightPressed = false;
         movingRight = false;
-        if(movingLeft) {
-            callback(MOVING_LEFT, rising || falling);
-        }
-        else {
-            standing = true;
-            callback(STANDING, rising || falling);
+        if(moveLeftPressed) {
+            controls.left.press();
         }
     };
 
     controls.jump.press = () => {
-        if(!(rising || falling)) {
+        jumpPressed = true;
+        if(!(rising || falling) && onGround && !onCeil && !attacking) {
             rising = true;
-            standing = false;
             callback(RISING);
         }
     };
     controls.jump.release = () => {
-        rising = false;
+        jumpPressed = false;
     };
 
     controls.attack.press = () => {
-        callback(ATTACKING);
-        attacking = true;
+        if(!attacking) {
+            attackPressed = true;
+            attacking = true;
+            callback(ATTACKING, falling || rising);
+        }
     };
 
     controls.attack.release = () => {
-        // attacking = false;
+        attackPressed = false;
     };
 
-    const updateState = (vx, vy, animsState) => {
-        if(attacking) {
-            console.log('a', animsState[ATTACKING]);
-            if(animsState[ATTACKING] === ANIM_COMPLETED) {
-                attacking = false;
-                if(!(falling || rising )) {
-                    standing = true;
-                    callback(STANDING);
-                }
-            }
+    const stand = () => {
+        if(!standing) {
+            standing = true;
+            callback(STANDING);
         }
-        else {
-            if(vy > 0 && !falling) {
+    };
+
+    const updateState = (vx, vy, animsState, grounded, ceilled) => {
+        onGround = grounded;
+        onCeil = ceilled;
+
+       if(attacking) {
+        if(animsState[ATTACKING] === ANIM_COMPLETED) {
+            attacking = false;
+            if(movingLeft) {
+                controls.left.press();
+            }
+            else if(movingRight) {
+                controls.right.press();
+            }
+            else {
+                stand();
+            }
+
+        }
+       }
+       else {
+        if(!movingRight && !movingLeft && !falling && !rising) {
+            stand();
+        }
+
+        if(vy > 0) {
+            if(!falling) {
+                standing = false;
                 rising = false;
                 falling = true;
                 callback(FALLING);
-            } else if (vy === 0) {
-                if(falling || rising) {
-                    if(movingLeft) {
-                        callback(MOVING_LEFT);
-                    }else if(movingRight) {
-                        callback(MOVING_RIGHT);
-                    }
-                    else {
-                        standing = true;
-                        callback(STANDING);
-                    }
-                }
-                rising = false;
-                falling = false;
-            }
-            if((movingRight || movingLeft) && vx === 0) {
-                if(!standing) {
-                    standing = true;
-                    callback(STANDING);
-                }
             }
         }
+        else if(vy === 0 && (falling || rising)) {
+            rising = false;
+            falling = false;
+
+            if(movingLeft) {
+                    controls.left.press();
+            }
+            else if(movingRight) {
+                    controls.right.press();
+            }
+            else {
+                    stand();
+            }
+        }
+
+        if(jumpPressed && !falling && !rising) {
+            controls.jump.press();
+        }
+      }
+
+
     };
 
     return {controls, updateState};

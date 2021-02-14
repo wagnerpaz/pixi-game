@@ -49,6 +49,9 @@ export default (app) => {
 
             if(action === ATTACKING) {
                 console.log('attacking');
+                if(!param) {
+                    hero.vx = 0;
+                }
                 heroAnim.attack();
             }
     
@@ -69,14 +72,17 @@ export default (app) => {
             hero.x += xu;
         };
 
+        let diffY = 0;
         const updateBeforeColY = (delta) => {
             hero.vy += GRAVITY;
             const yu = hero.vy * delta;
             hero.y += yu;
+            diffY = hero.y;
         };
 
-        const updateAfterCol = () => {
-            updateState(hero.vx, hero.vy, heroAnimsState);
+        const updateAfterCol = (delta, ceilled) => {
+            diffY = hero.y - diffY;
+            updateState(hero.vx, hero.vy, heroAnimsState, diffY < 0, ceilled);
         };
 
         res({actor: hero, updateBeforeColX, updateBeforeColY, updateAfterCol});
