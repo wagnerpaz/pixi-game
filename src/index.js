@@ -101,7 +101,7 @@ async function load() {
             scrollArea.x += nxu;
             app.stage.x -= nxu;
         }
-        else if(hero.x  >= scrollArea.x + scrollArea.width && app.stage.x + app.stage.width > -app.stage.width) {
+        else if(hero.x + hero.width  >= scrollArea.x + scrollArea.width && app.stage.x + app.stage.width > -app.stage.width) {
             scrollArea.x += nxu;
             app.stage.x -= nxu;
         }

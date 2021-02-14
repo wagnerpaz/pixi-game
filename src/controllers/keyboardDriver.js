@@ -12,4 +12,8 @@ export default (controls) => {
     const kbArrowUp = keyboard('ArrowUp');
     kbArrowUp.press = controls.jump.press;
     kbArrowUp.release = controls.jump.release;
+
+    const kbControl = keyboard('Control');
+    kbControl.press = controls.attack.press;
+    kbControl.release = controls.attack.release;
 };

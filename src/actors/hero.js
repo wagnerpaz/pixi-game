@@ -1,9 +1,10 @@
 import * as PIXI from 'pixi.js';
 
 import {GRAVITY, VELOCITY_X, VELOCITY_Y} from '../index';
+import { ATTACKING, FALLING, MOVING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from '../actions/heroActions';
 
 import createHeroAnim from '../anims/heroAnim';
-import HeroState, { FALLING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from '../state/HeroActionsState';
+import HeroState from '../state/HeroActionsState';
 import keyboardDriver from '../controllers/keyboardDriver';
 import mobileDriver from '../controllers/mobileDriver';
 
@@ -11,7 +12,7 @@ export default (app) => {
     const result = new Promise(async res => {
         const hero = new PIXI.Container();
 
-        const {anims: heroAnim} = await createHeroAnim(PIXI, app, hero);
+        const {anims: heroAnim, animsState: heroAnimsState} = await createHeroAnim(PIXI, app, hero);
 
         hero.vx = 0;
         hero.vy = 0;
@@ -45,6 +46,11 @@ export default (app) => {
                 console.log('falling');
                 heroAnim.fall();
             }
+
+            if(action === ATTACKING) {
+                console.log('attacking');
+                heroAnim.attack();
+            }
     
             if(action === STANDING) {
                 console.log('standing');
@@ -70,7 +76,7 @@ export default (app) => {
         };
 
         const updateAfterCol = () => {
-            updateState(hero.vx, hero.vy);
+            updateState(hero.vx, hero.vy, heroAnimsState);
         };
 
         res({actor: hero, updateBeforeColX, updateBeforeColY, updateAfterCol});
