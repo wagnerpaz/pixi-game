@@ -58,12 +58,14 @@ export default (app) => {
         keyboardDriver(controls);
         mobileDriver(controls);
 
-        const updateBeforeCol = (delta) => {
-            hero.vy += GRAVITY;
+        const updateBeforeColX = (delta) => {
             const xu = hero.vx * delta;
-            const yu = hero.vy * delta;
-            
             hero.x += xu;
+        };
+
+        const updateBeforeColY = (delta) => {
+            hero.vy += GRAVITY;
+            const yu = hero.vy * delta;
             hero.y += yu;
         };
 
@@ -71,7 +73,7 @@ export default (app) => {
             updateState(hero.vx, hero.vy);
         };
 
-        res({actor: hero, updateBeforeCol, updateAfterCol});
+        res({actor: hero, updateBeforeColX, updateBeforeColY, updateAfterCol});
     });
     return result;
 };

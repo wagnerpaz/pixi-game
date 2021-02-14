@@ -38,14 +38,14 @@ async function load() {
     const {collidables, tilemap: caveMap} = await createCave(app);
     app.stage.addChild(caveMap);
 
-    const {actor: hero, updateBeforeCol: updateHeroBC, updateAfterCol: updateHeroAC} = await createHero(app);
+    const {actor: hero, updateBeforeColX: updateHeroBCX, updateBeforeColY: updateHeroBCY, updateAfterCol: updateHeroAC} = await createHero(app);
     app.stage.addChild(hero); 
 
     app.stage.x = 0;
     app.stage.y = (hero.x - SCROLL_AREA_HEIGHT) - hero.height / 2 - app.stage.height / 2;
 
     const scrollArea = new PIXI.Graphics();
-    scrollArea.visible = true;
+    scrollArea.visible = false;
     scrollArea.lineStyle(1, 0xFF0000);
     scrollArea.drawRect( 
         0,
@@ -63,28 +63,39 @@ async function load() {
         const oxu = hero.x;
         const oyu = hero.y;
 
-        updateHeroBC(delta);
+        updateHeroBCX(delta);
 
         collidables.every((collidable) => {
             let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
             let hitResp = hitTestRectangle(heroBB, collidable);
-            if(!!hitResp) {
-                if(hitResp.overlapV.x) {
-                    hero.x -= hitResp.overlapV.x;
-                }
-                else if(hitResp.overlapV.y) {
-                    hero.vy = 0;
-                    hero.y -= hitResp.overlapV.y;
-                }
+            if(!!hitResp && hitResp.overlapV.x) {
+                hero.x -= hitResp.overlapV.x;
+                hero.y -= hitResp.overlapV.y;
+                return false;
             }
-
             return true;
         });
+
+        updateHeroBCY(delta);
+        
+        collidables.every((collidable) => {
+            let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
+            let hitResp = hitTestRectangle(heroBB, collidable);
+            if(!!hitResp && hitResp.overlapV.y) {
+                hero.vy = 0;
+                hero.x -= hitResp.overlapV.x;
+                hero.y -= hitResp.overlapV.y;
+                return false;
+            }
+            return true;
+        });
+        
+        updateHeroAC(delta);
 
         const nxu = hero.x - oxu;
         const nyu = hero.y - oyu;
 
-        console.log(hero.x, scrollArea.x, caveMap.x, app.stage.x + app.stage.width, app.stage.width - app.view.width);
+        // console.log(hero.x, scrollArea.x, caveMap.x, app.stage.x + app.stage.width, app.stage.width - app.view.width);
 
         if(hero.x  <= scrollArea.x && app.stage.x < 0) {
             scrollArea.x += nxu;
@@ -103,8 +114,6 @@ async function load() {
             scrollArea.y += nyu;
             app.stage.y -= nyu;
         }
-
-        updateHeroAC(delta);
     });
 };
 load();
