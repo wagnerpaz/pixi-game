@@ -74,7 +74,7 @@ export default (app) => {
 
         let diffY = 0;
         const updateBeforeColY = (delta) => {
-            hero.vy += GRAVITY;
+            hero.vy += GRAVITY * delta;
             const yu = hero.vy * delta;
             hero.y += yu;
             diffY = hero.y;

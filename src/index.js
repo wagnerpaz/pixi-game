@@ -2,10 +2,9 @@ import * as PIXI from 'pixi.js';
 import SAT from 'sat';
 
 import createHero from './actors/hero';
-import heroAnim from './anims/heroAnim';
 import createCave from './stages/cave';
 
-export const GRAVITY = 0.098;
+export const GRAVITY = 0.05;
 export const VELOCITY_X = 1;
 export const VELOCITY_Y = 2;
 export const SCROLL_AREA_WIDTH = 50;
