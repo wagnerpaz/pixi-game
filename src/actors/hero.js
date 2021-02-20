@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 
-import {GRAVITY, VELOCITY_X, VELOCITY_Y} from '../index';
+import {GRAVITY} from '../index';
 import { ATTACKING, FALLING, MOVING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from '../actions/heroActions';
 
 import createHeroAnim from '../anims/heroAnim';
@@ -8,11 +8,14 @@ import HeroState from '../state/HeroActionsState';
 import keyboardDriver from '../controllers/keyboardDriver';
 import mobileDriver from '../controllers/mobileDriver';
 
+export const VELOCITY_X = 1;
+export const VELOCITY_Y = 2;
+
 export default (app) => {
     const result = new Promise(async res => {
         const hero = new PIXI.Container();
 
-        const {anims: heroAnim, animsState: heroAnimsState} = await createHeroAnim(PIXI, app, hero);
+        const {anims: heroAnim, animsState: heroAnimsState} = await createHeroAnim(app, hero);
 
         hero.vx = 0;
         hero.vy = 0;
@@ -85,7 +88,13 @@ export default (app) => {
             updateState(hero.vx, hero.vy, heroAnimsState, diffY < 0, ceilled);
         };
 
-        res({actor: hero, updateBeforeColX, updateBeforeColY, updateAfterCol});
+        hero.updateBeforeColX = updateBeforeColX;
+        hero.updateBeforeColY = updateBeforeColY;
+        hero.updateAfterCol = updateAfterCol;
+        hero.VELOCITY_X = VELOCITY_X;
+        hero.VELOCITY_Y = VELOCITY_Y;
+
+        res({actor: hero});
     });
     return result;
 };

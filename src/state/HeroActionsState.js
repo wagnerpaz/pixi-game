@@ -1,5 +1,5 @@
 import { ATTACKING, FALLING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from '../actions/heroActions';
-import {ANIM_COMPLETED, ANIM_STOPED} from '../anims/heroAnim';
+import {ANIM_COMPLETED} from '../anims/animStates';
 
 export default (callback) => {
     let moveLeftPressed = false;
@@ -86,7 +86,8 @@ export default (callback) => {
         onCeil = ceilled;
 
        if(attacking) {
-        if(animsState[ATTACKING] === ANIM_COMPLETED) {
+           if(animsState[ATTACKING] === ANIM_COMPLETED) {
+            console.log('a', animsState[ATTACKING]);
             attacking = false;
             if(movingLeft) {
                 controls.left.press();

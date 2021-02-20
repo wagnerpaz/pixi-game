@@ -2,12 +2,10 @@ import * as PIXI from 'pixi.js';
 import SAT from 'sat';
 
 import createHero from './actors/hero';
-import heroAnim from './anims/heroAnim';
+import createBat from './actors/bat';
 import createCave from './stages/cave';
 
 export const GRAVITY = 0.098;
-export const VELOCITY_X = 1;
-export const VELOCITY_Y = 2;
 export const SCROLL_AREA_WIDTH = 50;
 export const SCROLL_AREA_HEIGHT = 50;
 
@@ -35,11 +33,22 @@ window.onresize();
 document.body.appendChild(app.view);
 
 async function load() {
+    
     const {collidables, tilemap: caveMap} = await createCave(app);
     app.stage.addChild(caveMap);
-
-    const {actor: hero, updateBeforeColX: updateHeroBCX, updateBeforeColY: updateHeroBCY, updateAfterCol: updateHeroAC} = await createHero(app);
+    
+    const actors = [];
+    const {actor: hero} = await createHero(app);
     app.stage.addChild(hero); 
+    actors.push(hero);
+
+    const {actor: bat} = await createBat(app, hero);
+    bat.x = 200;
+    bat.y = 50;
+    app.stage.addChild(bat); 
+    actors.push(bat);
+
+    console.log(actors);
 
     app.stage.x = 0;
     app.stage.y = (hero.x - SCROLL_AREA_HEIGHT) - hero.height / 2 - app.stage.height / 2;
@@ -63,52 +72,53 @@ async function load() {
         const oxu = hero.x;
         const oyu = hero.y;
 
-        updateHeroBCX(delta);
+        actors.forEach(actor => {
 
-        collidables.every((collidable) => {
-            let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
-            let hitResp = hitTestRectangle(heroBB, collidable);
-            if(!!hitResp && hitResp.overlapV.x) {
-                hero.x -= hitResp.overlapV.x;
-                hero.y -= hitResp.overlapV.y;
-                return false;
-            }
-            return true;
-        });
+            actor.updateBeforeColX(delta);
 
-        updateHeroBCY(delta);
-        
-        collidables.every((collidable) => {
-            let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
-            let hitResp = hitTestRectangle(heroBB, collidable);
-            if(!!hitResp && hitResp.overlapV.y) {
-                hero.vy = 0;
-                hero.x -= hitResp.overlapV.x;
-                hero.y -= hitResp.overlapV.y;
-                return false;
-            }
-            return true;
-        });
-        
-        let ceilled = false;
-        collidables.every((collidable) => {
-            let heroBB = parentPositionRef(hero.getChildAt(0).boundingBox);
-            heroBB.y -= VELOCITY_Y;
+            collidables.every((collidable) => {
+                let bb = parentPositionRef(actor.getChildAt(0).boundingBox);
+                let hitResp = hitTestRectangle(bb, collidable);
+                if(!!hitResp && hitResp.overlapV.x) {
+                    actor.x -= hitResp.overlapV.x;
+                    actor.y -= hitResp.overlapV.y;
+                    return false;
+                }
+                return true;
+            });
+
+            actor.updateBeforeColY(delta);
             
-            let hitResp = hitTestRectangle(heroBB, collidable);
-            if(!!hitResp && hitResp.overlapV.y) {
-                ceilled = true;
-                return false;
-            }
-            return true;
+            collidables.every((collidable) => {
+                let bb = parentPositionRef(actor.getChildAt(0).boundingBox);
+                let hitResp = hitTestRectangle(bb, collidable);
+                if(!!hitResp && hitResp.overlapV.y) {
+                    actor.vy = 0;
+                    actor.x -= hitResp.overlapV.x;
+                    actor.y -= hitResp.overlapV.y;
+                    return false;
+                }
+                return true;
+            });
+            
+            let ceilled = false;
+            collidables.every((collidable) => {
+                let bb = parentPositionRef(actor.getChildAt(0).boundingBox);
+                bb.y -= actor.VELOCITY_Y;
+                
+                let hitResp = hitTestRectangle(bb, collidable);
+                if(!!hitResp && hitResp.overlapV.y) {
+                    ceilled = true;
+                    return false;
+                }
+                return true;
+            });
+            
+            actor.updateAfterCol(delta, ceilled);
         });
-        
-        updateHeroAC(delta, ceilled);
 
         const nxu = hero.x - oxu;
         const nyu = hero.y - oyu;
-
-        // console.log(hero.x, scrollArea.x, caveMap.x, app.stage.x + app.stage.width, app.stage.width - app.view.width);
 
         if(hero.x  <= scrollArea.x && app.stage.x < 0) {
             scrollArea.x += nxu;

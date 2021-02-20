@@ -1,46 +1,14 @@
-import { ATTACKING, FALLING, MOVING, MOVING_LEFT, MOVING_RIGHT, RISING, STANDING } from '../actions/heroActions';
+import * as PIXI from 'pixi.js';
 
-export const ANIM_STOPED = 0;
-export const ANIM_PLAYING = 1;
-export const ANIM_COMPLETED = 2;
+import { ATTACKING, FALLING, MOVING, RISING, STANDING } from '../actions/heroActions';
+import anims from './animStates';
 
-export default (PIXI, app, container) => {
+export default (app, container) => {
     return new Promise(res => {
         app.loader.add('hero.json').load((loader, resources) => {
             const sheet = resources['hero.json'];
 
-            const animsState = {};
-        
-            const anims = [];
-            const addAnim = (name, action) => {
-                const anim = new PIXI.AnimatedSprite(sheet.spritesheet.animations[name]);
-                anim.action = action;
-                anims.push(anim);
-                return anim;
-            };
-            const invalidateAnims = (anim) => {
-                anims.forEach(a => {
-                    a.stop();
-                    a.gotoAndStop(0);
-                    container.removeChildren();
-                    animsState[anim.action] = ANIM_STOPED;
-                });
-            };
-            const validateAnim = (anim) => {
-                anim.play();
-                container.addChild(anim);
-                container.addChild(anim.boundingBox);
-            };
-            const run = (anim, onComplete) => {
-                invalidateAnims(anim);
-                validateAnim(anim);
-
-                animsState[anim.action] = ANIM_PLAYING;
-                anim.onComplete = () => {
-                    animsState[anim.action] = ANIM_COMPLETED;
-                };
-                return {onComplete};
-            }
+            const {addAnim, run, animsState} = anims(sheet, container);
     
             const heroStanding = addAnim("hero_standing", STANDING);
             heroStanding.animationSpeed = 0.025;
