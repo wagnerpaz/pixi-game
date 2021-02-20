@@ -5,7 +5,7 @@ import createHero from './actors/hero';
 import createBat from './actors/bat';
 import createCave from './stages/cave';
 
-export const GRAVITY = 0.098;
+export const GRAVITY = 0.05;
 export const SCROLL_AREA_WIDTH = 50;
 export const SCROLL_AREA_HEIGHT = 50;
 
